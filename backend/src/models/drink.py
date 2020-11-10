@@ -50,6 +50,15 @@ class Drink(db.Model):
         }
 
     """
+    find(id)
+        tries to find a Drink by id
+    """
+
+    @classmethod
+    def find(cls, id) -> any:
+        return db.session.query(cls).filter(cls.id == id).first()
+
+    """
     insert()
         inserts a new model into a database
         the model must have a unique name
