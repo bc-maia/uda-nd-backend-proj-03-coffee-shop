@@ -50,13 +50,25 @@ class Drink(db.Model):
         }
 
     """
+    all()
+        returns all drinks
+    """
+
+    @classmethod
+    def all(cls, detail=False) -> list:
+        if query := cls.query.all():
+            return [d.long() if detail else d.short() for d in query]
+        else:
+            return None
+
+    """
     find(id)
         tries to find a Drink by id
     """
 
     @classmethod
     def find(cls, id) -> any:
-        return db.session.query(cls).filter(cls.id == id).first()
+        return cls.query.filter(cls.id == id).first()
 
     """
     insert()

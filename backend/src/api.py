@@ -33,8 +33,7 @@ def create_app():
 
     @app.route("/drinks")
     def drinks():
-        response = Drink.query.all()
-        if drinks := [drink.short() for drink in response]:
+        if drinks := Drink.all():
             return jsonify({"success": True, "drinks": drinks})
         else:
             abort(404)
@@ -51,8 +50,7 @@ def create_app():
 
     @app.route("/drinks-detail")
     def drinks_detail():
-        response = Drink.query.all()
-        if drinks := [drink.long() for drink in response]:
+        if drinks := Drink.all(True):
             return jsonify({"success": True, "drinks": drinks})
         else:
             abort(404)
