@@ -1,7 +1,5 @@
-import os
-from typing import Text
 from flask import Flask, request, jsonify, abort
-import json
+from flask import json
 from flask.wrappers import Response
 from sqlalchemy import exc
 from flask_cors import CORS
@@ -22,10 +20,6 @@ def create_app():
     """
     # db_drop_and_create_all()
 
-    @app.route("/")
-    def home():
-        return json.dumps({"success": True}), 200
-
     # ROUTES
     """
     TODO: implement endpoint
@@ -38,8 +32,12 @@ def create_app():
     """
 
     @app.route("/drinks")
-    def drinks(self):
-        return jsonify(Text="#TODO: GET /drinks")
+    def drinks():
+        response = Drink.query.all()
+        if drinks := [drink.short() for drink in response]:
+            return jsonify({"success": True, "drinks": drinks})
+        else:
+            abort(404)
 
     """
     TODO: implement endpoint
@@ -52,8 +50,12 @@ def create_app():
     """
 
     @app.route("/drinks-detail")
-    def drinks_detail(self):
-        return jsonify(Text="#TODO: GET /drinks-detail")
+    def drinks_detail():
+        response = Drink.query.all()
+        if drinks := [drink.long() for drink in response]:
+            return jsonify({"success": True, "drinks": drinks})
+        else:
+            abort(404)
 
     """
     TODO: implement endpoint
@@ -104,18 +106,21 @@ def create_app():
         return jsonify(Text=f"#TODO: DELETE /drinks/{id}")
 
     # Error Handling
-    @app.errorhandler(400)
-    def bad_request(error):
+    def handle_json(message: str, status: int) -> any:
         return (
             jsonify(
                 {
                     "success": False,
-                    "error": 400,
-                    "message": "bad request",
+                    "message": message,
+                    "error": status,
                 }
             ),
-            400,
+            status,
         )
+
+    @app.errorhandler(400)
+    def bad_request(error):
+        return handle_json("bad request", 400)
 
     """
     TODO: implement error handler for 404
@@ -124,42 +129,15 @@ def create_app():
 
     @app.errorhandler(404)
     def not_found(error):
-        return (
-            jsonify(
-                {
-                    "success": False,
-                    "error": 404,
-                    "message": "resource not found",
-                }
-            ),
-            404,
-        )
+        return handle_json(message="resource not found", status=404)
 
     @app.errorhandler(405)
     def not_allowed(error):
-        return (
-            jsonify(
-                {
-                    "success": False,
-                    "error": 405,
-                    "message": "method not allowed",
-                }
-            ),
-            405,
-        )
+        return handle_json("method not allowed", 405)
 
     @app.errorhandler(422)
     def unprocessable(error):
-        return (
-            jsonify(
-                {
-                    "success": False,
-                    "error": 422,
-                    "message": "unprocessable",
-                }
-            ),
-            422,
-        )
+        return handle_json("unprocessable", 422)
 
     """
     TODO: implement error handler for AuthError
@@ -168,28 +146,10 @@ def create_app():
 
     @app.errorhandler(401)
     def unauthorized(error):
-        return (
-            jsonify(
-                {
-                    "success": False,
-                    "error": 401,
-                    "message": "unauthorized",
-                }
-            ),
-            403,
-        )
+        return handle_json("unauthorized", 401)
 
     @app.errorhandler(403)
     def forbidden(error):
-        return (
-            jsonify(
-                {
-                    "success": False,
-                    "error": 403,
-                    "message": "forbidden",
-                }
-            ),
-            403,
-        )
+        return handle_json("forbidden", 403)
 
     return app

@@ -17,7 +17,8 @@ class Drink(db.Model):
     # String Title
     title = Column(String(80), unique=True)
     # the ingredients blob - this stores a lazy json blob
-    # the required datatype is [{'color': string, 'name':string, 'parts':number}]
+    # the required datatype is
+    # [{'color': string, 'name':string, 'parts':number}]
     recipe = Column(String(180), nullable=False)
 
     """
@@ -28,7 +29,11 @@ class Drink(db.Model):
     def short(self):
         print(json.loads(self.recipe))
         short_recipe = [
-            {"color": r["color"], "parts": r["parts"]} for r in json.loads(self.recipe)
+            {
+                "color": r["color"],
+                "parts": r["parts"],
+            }
+            for r in json.loads(self.recipe)
         ]
         return {"id": self.id, "title": self.title, "recipe": short_recipe}
 
@@ -38,7 +43,11 @@ class Drink(db.Model):
     """
 
     def long(self):
-        return {"id": self.id, "title": self.title, "recipe": json.loads(self.recipe)}
+        return {
+            "id": self.id,
+            "title": self.title,
+            "recipe": json.loads(self.recipe),
+        }
 
     """
     insert()
