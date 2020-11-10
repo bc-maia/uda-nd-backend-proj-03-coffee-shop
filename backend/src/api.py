@@ -87,7 +87,11 @@ def create_app():
 
     @app.route("/drinks/<id>", methods=["PATCH"])
     def update_drink(id):
-        return jsonify(Text=f"#TODO: PATCH /drinks/{id}")
+        if drink := Drink.find(id):
+            print(drink.short())
+            return jsonify(Text=f"#TODO: DELETE /drinks/{id}")
+        else:
+            abort(404)
 
     """
     TODO: implement endpoint
@@ -103,7 +107,11 @@ def create_app():
 
     @app.route("/drinks/<id>", methods=["DELETE"])
     def remove_drink(id):
-        return jsonify(Text=f"#TODO: DELETE /drinks/{id}")
+        if drink := Drink.find(id):
+            print(drink.short())
+            return jsonify(Text=f"#TODO: DELETE /drinks/{id}")
+        else:
+            abort(404)
 
     # Error Handling
     def handle_json(message: str, status: int) -> any:
