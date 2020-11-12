@@ -26,8 +26,7 @@ class Drink(db.Model):
         short form representation of the Drink model
     """
 
-    def short(self):
-        print(json.loads(self.recipe))
+    def short(self) -> dict:
         short_recipe = [
             {
                 "color": r["color"],
@@ -42,7 +41,7 @@ class Drink(db.Model):
         long form representation of the Drink model
     """
 
-    def long(self):
+    def long(self) -> dict:
         return {
             "id": self.id,
             "title": self.title,
@@ -63,12 +62,17 @@ class Drink(db.Model):
 
     """
     find(id)
-        tries to find a Drink by id
+    find_by(title)
+        tries to find a Drink by id or by title
     """
 
     @classmethod
     def find(cls, id) -> any:
-        return cls.query.filter(cls.id == id).first()
+        return cls.query.filter(cls.id == id).one_or_none()
+
+    @classmethod
+    def find_by(cls, title) -> any:
+        return cls.query.filter(cls.title == title).one_or_none()
 
     """
     insert()
@@ -85,19 +89,6 @@ class Drink(db.Model):
         db.session.commit()
 
     """
-    delete()
-        deletes a new model into a database
-        the model must exist in the database
-        EXAMPLE
-            drink = Drink(title=req_title, recipe=req_recipe)
-            drink.delete()
-    """
-
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
-    """
     update()
         updates a new model into a database
         the model must exist in the database
@@ -108,6 +99,19 @@ class Drink(db.Model):
     """
 
     def update(self):
+        db.session.commit()
+
+    """
+    delete()
+        deletes a new model into a database
+        the model must exist in the database
+        EXAMPLE
+            drink = Drink(title=req_title, recipe=req_recipe)
+            drink.delete()
+    """
+
+    def delete(self):
+        db.session.delete(self)
         db.session.commit()
 
     def __repr__(self):

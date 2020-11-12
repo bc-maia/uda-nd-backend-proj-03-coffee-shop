@@ -1,3 +1,4 @@
+from typing import Text
 from flask import Flask, request, jsonify, abort
 from flask import json
 from flask.wrappers import Response
@@ -14,15 +15,18 @@ def create_app():
     CORS(app)
 
     """
-    TODO: uncomment the following line to initialize the database
+    TODO-DONE: uncomment the following line to initialize the database
     !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
     !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
     """
     # db_drop_and_create_all()
 
-    # ROUTES
     """
-    TODO: implement endpoint
+    ROUTES
+    """
+
+    """
+    TODO-DONE: implement endpoint
         GET /drinks
             it should be a public endpoint
             it should contain only the drink.short() data representation
@@ -39,7 +43,7 @@ def create_app():
             abort(404)
 
     """
-    TODO: implement endpoint
+    TODO-DONE: implement endpoint
         GET /drinks-detail
             it should require the 'get:drinks-detail' permission
             it should contain the drink.long() data representation
@@ -56,7 +60,7 @@ def create_app():
             abort(404)
 
     """
-    TODO: implement endpoint
+    TODO-DONE: implement endpoint
         POST /drinks
             it should create a new row in the drinks table
             it should require the 'post:drinks' permission
@@ -68,10 +72,23 @@ def create_app():
 
     @app.route("/drinks", methods=["POST"])
     def add_drink():
-        return jsonify(Text="#TODO: POST /drinks")
+        payload = request.get_json()
+        title = payload["title"]
+        if drink := Drink.find_by(title):
+            abort(
+                Response(
+                    response=f"Drink '{title}' already exists!",
+                    status=405,
+                )
+            )
+        else:
+            recipe = json.dumps(payload["recipe"])
+            drink = Drink(title=title, recipe=recipe)
+            drink.insert()
+            return jsonify({"success": True, "drinks": drink.long()})
 
     """
-    TODO: implement endpoint
+    TODO-DONE: implement endpoint
         PATCH /drinks/<id>
             where <id> is the existing model id
             it should respond with a 404 error if <id> is not found
@@ -85,14 +102,19 @@ def create_app():
 
     @app.route("/drinks/<id>", methods=["PATCH"])
     def update_drink(id):
+        payload = request.get_json()
         if drink := Drink.find(id):
-            print(drink.short())
-            return jsonify(Text=f"#TODO: DELETE /drinks/{id}")
+            if title := payload["title"]:
+                drink.title = title
+            if recipe := payload["recipe"]:
+                drink.recipe = json.dumps(recipe)
+            drink.update()
+            return jsonify({"success": True, "drinks": drink.long()})
         else:
             abort(404)
 
     """
-    TODO: implement endpoint
+    TODO-DONE: implement endpoint
         DELETE /drinks/<id>
             where <id> is the existing model id
             it should respond with a 404 error if <id> is not found
@@ -106,13 +128,16 @@ def create_app():
     @app.route("/drinks/<id>", methods=["DELETE"])
     def remove_drink(id):
         if drink := Drink.find(id):
-            print(drink.short())
-            return jsonify(Text=f"#TODO: DELETE /drinks/{id}")
+            drink.delete()
+            return jsonify({"success": True, "delete": id})
         else:
             abort(404)
 
-    # Error Handling
-    def handle_json(message: str, status: int) -> any:
+    """
+    Error Handling
+    """
+
+    def format_handler(message: str, status: int) -> any:
         return (
             jsonify(
                 {
@@ -126,24 +151,24 @@ def create_app():
 
     @app.errorhandler(400)
     def bad_request(error):
-        return handle_json("bad request", 400)
+        return format_handler("bad request", 400)
 
     """
-    TODO: implement error handler for 404
+    TODO-DONE: implement error handler for 404
         error handler should conform to general task above
     """
 
     @app.errorhandler(404)
     def not_found(error):
-        return handle_json(message="resource not found", status=404)
+        return format_handler(message="resource not found", status=404)
 
     @app.errorhandler(405)
     def not_allowed(error):
-        return handle_json("method not allowed", 405)
+        return format_handler("method not allowed", 405)
 
     @app.errorhandler(422)
     def unprocessable(error):
-        return handle_json("unprocessable", 422)
+        return format_handler("unprocessable", 422)
 
     """
     TODO: implement error handler for AuthError
@@ -152,10 +177,10 @@ def create_app():
 
     @app.errorhandler(401)
     def unauthorized(error):
-        return handle_json("unauthorized", 401)
+        return format_handler("unauthorized", 401)
 
     @app.errorhandler(403)
     def forbidden(error):
-        return handle_json("forbidden", 403)
+        return format_handler("forbidden", 403)
 
     return app
