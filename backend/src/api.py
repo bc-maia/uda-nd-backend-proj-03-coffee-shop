@@ -171,7 +171,7 @@ def create_app():
         return format_handler("unprocessable", 422)
 
     """
-    TODO: implement error handler for AuthError
+    TODO-DONE: implement error handler for AuthError
         error handler should conform to general task above
     """
 
