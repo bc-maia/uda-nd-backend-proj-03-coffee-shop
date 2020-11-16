@@ -53,6 +53,7 @@ def create_app():
     """
 
     @app.route("/drinks-detail")
+    @requires_auth("get:drinks-detail")
     def drinks_detail():
         if drinks := Drink.all(True):
             return jsonify({"success": True, "drinks": drinks})
@@ -71,6 +72,7 @@ def create_app():
     """
 
     @app.route("/drinks", methods=["POST"])
+    @requires_auth("post:drinks")
     def add_drink():
         payload = request.get_json()
         title = payload["title"]
@@ -101,6 +103,7 @@ def create_app():
     """
 
     @app.route("/drinks/<id>", methods=["PATCH"])
+    @requires_auth("patch:drinks")
     def update_drink(id):
         payload = request.get_json()
         if drink := Drink.find(id):
@@ -126,6 +129,7 @@ def create_app():
     """
 
     @app.route("/drinks/<id>", methods=["DELETE"])
+    @requires_auth("delete:drinks")
     def remove_drink(id):
         if drink := Drink.find(id):
             drink.delete()
