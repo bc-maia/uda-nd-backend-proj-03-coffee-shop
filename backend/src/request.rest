@@ -1,0 +1,4 @@
+
+###
+
+GET https://uda-cafe.us.auth0.com/authorize?audience=cafe&response_type=token&client_id=klc8IWJ1W3KdRsllf54A7OpW4CrxZbV4&redirect_uri=http://localhost:8100/tabs/user-page
