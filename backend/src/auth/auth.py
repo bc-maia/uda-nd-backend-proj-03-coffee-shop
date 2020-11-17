@@ -64,9 +64,9 @@ TODO-DONE: implement check_permissions(permission, payload) method
 
 def check_permissions(permits, payload) -> any:
     if "permissions" not in payload:
-        abort(401)
+        raise AuthError(error="Missing permission", status_code=401)
     if permits not in payload["permissions"]:
-        abort(403)
+        raise AuthError(error="Permission mismatch", status_code=403)
     return True
 
 

@@ -1,17 +1,15 @@
-from typing import Text
+import database
+from auth import AuthError, requires_auth
+from models import Drink
 from flask import Flask, request, jsonify, abort
 from flask import json
 from flask.wrappers import Response
-from sqlalchemy import exc
 from flask_cors import CORS
-from models import Drink
-from database import db_drop_and_create_all, setup_db
-from auth import AuthError, requires_auth
 
 
 def create_app():
     app = Flask(__name__)
-    setup_db(app)
+    database.setup_db(app)
     CORS(app)
 
     """
@@ -19,7 +17,7 @@ def create_app():
     !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
     !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
     """
-    # db_drop_and_create_all()
+    # database.db_drop_and_create_all()
 
     """
     ROUTES
@@ -178,6 +176,19 @@ def create_app():
     TODO-DONE: implement error handler for AuthError
         error handler should conform to general task above
     """
+
+    @app.errorhandler(AuthError)
+    def authentification_failed(AuthError):
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "error": AuthError.status_code,
+                    "message": AuthError.error,
+                }
+            ),
+            AuthError.status_code,
+        )
 
     @app.errorhandler(401)
     def unauthorized(error):
